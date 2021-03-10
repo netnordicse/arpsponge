@@ -57,6 +57,9 @@ ifeq (${OS}, linux)
   GROUP                   = root
   DFL_SOCK_GROUP          = wheel
   ETC_DEFAULT             = /etc/default
+  ifeq (${DISTRO_FLAVOR},redhat)
+    LIBROOT               = $(DIRPREFIX)/lib64/perl5
+  endif
   ifeq (${DISTRO_FLAVOR},debian)
     LIBROOT               = $(DIRPREFIX)/lib/site_perl
   endif

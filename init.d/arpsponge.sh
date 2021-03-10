@@ -47,7 +47,8 @@ export  \
         SPONGE_NETWORK \
         SWEEP \
         SWEEP_AT_START \
-        SWEEP_SKIP_ALIVE
+        SWEEP_SKIP_ALIVE \
+        IGNORE_IPS
 
 # Defaults for all sponges.
 if [ -f "${ETC_DEFAULT}/${PROG}/defaults" ]; then
@@ -149,6 +150,7 @@ start_sponge() {
         opts=$(fix_opts "$opts" --permissions "${PERMISSIONS}")
         opts=$(fix_opts "$opts" --arp-update-method "${ARP_UPDATE_METHOD}")
         opts=$(fix_opts "$opts" --flood-protection "${FLOOD_PROTECTION}")
+        opts=$(fix_opts "$opts" --ignore-ips "${IGNORE_IPS}")
 
         if eval_bool $SPONGE_DEBUG
         then

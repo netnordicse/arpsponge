@@ -106,6 +106,7 @@ sub queue            { $_[0]->{'queue'} }
 sub device           { $_[0]->{'device'} }
 sub phys_device      { $_[0]->{'phys_device'} }
 sub pending          { $_[0]->{'pending'} }
+sub ignore_ip_list   { $_[0]->{'ignore_ip_list'} }
 
 sub is_my_ip         { $_[0]->{'ip_all'}->{$_[1]} }
 sub is_my_ip_s       { $_[0]->{'ip_all'}->{ip2hex($_[1])} }

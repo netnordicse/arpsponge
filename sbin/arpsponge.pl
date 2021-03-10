@@ -118,6 +118,7 @@ Options:
   --sweep=sec/thr         - periodically sweep for "quiet" IP addresses
   --sweep-at-start        - perform sweep for all addresses at startup
   --sweep-skip-alive      - sweep avoids IP addresses in state ALIVE
+  --ignore-ips            - don't process these ips
   --verbose[=n]           - be verbose; print information on STDOUT;
                             turns off syslog
 
@@ -190,6 +191,7 @@ sub Main {
         'sweep-at-start!'     => \(my $sweep_at_start),
         'sweep-skip-alive'    => \(my $sweep_skip_alive),
         'verbose|v+'          => \(my $verbose),
+        'ignore-ips=s'        => \(my $ignore_ips),
         'version|V'           => sub { print "$PROG $VERSION\n"; exit 0 },
     ) or pod2usage(2);
 
@@ -210,7 +212,7 @@ sub Main {
         log_fatal("Bad value '%s' for --logmask: %s", $logmask, $err);
     }
 
-
+    my @ignore_ip_list = split /,/,$ignore_ips;
     my $sweep_threshold  = undef;
     if (length($sweep_sec)) {
         ($sweep_sec, $sweep_threshold) = $sweep_sec =~ m|^(\d+)/(\d+)$|
@@ -271,6 +273,7 @@ sub Main {
             sponge_net       => $sponge_net,
             gratuitous       => $gratuitous,
             flood_protection => $flood_protection,
+            ignore_ip_list   => @ignore_ip_list,
         );
 
     $sponge->is_dummy($dummy);
@@ -1018,6 +1021,14 @@ sub process_pkt {
             hex2ip($src_ip),   hex2ip($dst_ip),
             hex2mac($eth_obj->{dest_mac})
         );
+    }
+
+    if ( hex2ip($dst_ip) ~~ $sponge->ignore_ip_list ) {
+        event_notice(EVENT_SPONGE,
+                "IP in ignore list: src.mac=%s arp.tpa=%s\n",
+                hex2mac($src_mac), hex2ip($dst_ip)
+            );
+        return;
     }
 
     if ( ! $sponge->is_my_network($dst_ip) ) {
